@@ -19,7 +19,6 @@ const stateManagement = () => {
         <input type="text" className='border p-2' placeholder='Key Event'
         onKeyDown={(e) =>{
           console.log(e.code)
-
         }}
         />
       </div>
