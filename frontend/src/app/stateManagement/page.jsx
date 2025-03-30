@@ -1,28 +1,45 @@
-'use client'
-import React from 'react'
 
-const stateManagement = () => {
-  return (
-    <div className='container mx-auto'>
-        <h1 className='text-center font-bold text-3xl my-6'>Event handling</h1>
-        <button 
-         className='border p-2'
-         onClick={() => {alert('button was clicked');            
-         }}
-         >
-         submit
-        </button>
-        <input type='text' className='border p-2'
-        onChange={(e) => 
-        console.log(e.target.value)}
-        />
-        <input type="text" className='border p-2' placeholder='Key Event'
-        onKeyDown={(e) =>{
-          console.log(e.code)
-        }}
-        />
-      </div>
-  )
+'use client';
+import React, { useState } from 'react'
+
+const StateManagement = () => {
+
+    //let count = 0;
+
+    const [count, setCount] = useState(0);
+
+    return (
+        <div className='container mx-auto'>
+            <h1 className='text-center font-bold text-3xl my-6'>Event Handling</h1>
+
+            <button
+                className='border p-2'
+                onClick={() => { alert('button was clicked'); }}
+            >Submit</button>
+
+            <input type="text" className='border p-2'
+                onChange={(e) => {
+                    console.log(e.target.value);
+                }}
+            />
+
+            <input type="text" className='border p-2' placeholder='Key Event'
+                onKeyDown={(e) => {
+                    console.log(e.code);
+                }}
+            />
+
+            <h3 className='text-center text-3xl my-6'>StateManagement</h3>
+            <botton className='border p-2'
+            onClick={() => { setCount(count+1); console.log(count); }}
+            >
+              Increment Counter
+            </botton>
+            <p className='text-3xl font-bold'>
+              {count}
+            </p>
+        </div>
+    )
 }
 
-export default stateManagement
+export default StateManagement;
