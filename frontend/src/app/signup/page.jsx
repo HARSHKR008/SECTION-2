@@ -1,4 +1,5 @@
 'use client';
+import axios from 'axios';
 import { useFormik } from 'formik';
 import React from 'react'
 import * as Yup from 'yup';
@@ -21,8 +22,14 @@ const Signup = () => {
             confirmPassword: ''
         },
 
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log(values);
+
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/add`, values);
+            console.log(res.status);
+            console.log(res.data);
+            
+            
         },
         validationSchema: SignupSchema
     });
