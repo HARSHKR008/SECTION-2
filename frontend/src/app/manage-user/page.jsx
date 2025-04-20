@@ -1,6 +1,7 @@
 'use client';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
 
 const ManageUser = () => {
 
@@ -14,8 +15,14 @@ const ManageUser = () => {
     };
 
     useEffect(() => {
-      fetchUsers();
+        fetchUsers();
     }, []);
+
+    const deleteUser = async (id) => {
+        const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/user/delete/${id}`);
+        toast.success('User deleted successfully!');
+        fetchUsers();
+    }
 
     return (
         <div>
@@ -34,12 +41,14 @@ const ManageUser = () => {
                     <tbody>
                         {
                             userList.map((user) => {
-                                return <tr>
+                                return <tr key={user._id}>
                                     <td className='p-3'>{user._id}</td>
                                     <td className='p-3'>{user.name}</td>
                                     <td className='p-3'>{user.email}</td>
-                                    <td className='p-3'>{user.createdAt}</td>
-                                    <button></button>
+                                    <td className='p-3'>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                    <button onClick={() => { deleteUser(user._id) }} className='bg-red-500 text-white rounded p-3'>
+                                        Delete
+                                    </button>
                                 </tr>
                             })
                         }
