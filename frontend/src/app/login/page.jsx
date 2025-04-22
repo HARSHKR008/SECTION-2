@@ -1,7 +1,45 @@
+'use client';
 import Navbar from '@/components/Navbar';
-import React from 'react'
+import React from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Login = () => {
+    // Define validation schema with Yup
+    const validationSchema = Yup.object({
+        email: Yup.string()
+            .email('Invalid email address')
+            .required('Email is required'),
+        password: Yup.string()
+            .min(8, 'Password must be at least 8 characters')
+            .required('Password is required')
+    });
+
+    // Initialize Formik
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            password: ''
+        },
+        validationSchema,
+        onSubmit: (values, {setSubmitting, resetForm}) => {
+            console.log('Form submitted with values:', values);
+            
+            axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/authenticate`, values)
+            .then((result) => {
+                resetForm();
+                toast.success('Login successful!');
+            }).catch((err) => {
+                setSubmitting(false);
+                console.log(err);
+                
+                toast.error('Login failed!');
+            }); 
+        }
+    });
+
     return (
         <div>
             <div className="bg-white py-6 sm:py-8 lg:py-12">
@@ -9,7 +47,10 @@ const Login = () => {
                     <h2 className="mb-4 text-center text-2xl font-bold text-gray-800 md:mb-8 lg:text-3xl">
                         Login
                     </h2>
-                    <form className="mx-auto max-w-lg rounded-lg border">
+                    <form 
+                        className="mx-auto max-w-lg rounded-lg border"
+                        onSubmit={formik.handleSubmit}
+                    >
                         <div className="flex flex-col gap-4 p-4 md:p-8">
                             <div>
                                 <label
@@ -19,9 +60,21 @@ const Login = () => {
                                     Email
                                 </label>
                                 <input
+                                    id="email"
                                     name="email"
-                                    className="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring"
+                                    type="email"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.email}
+                                    className={`w-full rounded border ${
+                                        formik.touched.email && formik.errors.email 
+                                            ? 'border-red-500' 
+                                            : 'border-gray-300'
+                                    } bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring`}
                                 />
+                                {formik.touched.email && formik.errors.email ? (
+                                    <div className="mt-1 text-sm text-red-500">{formik.errors.email}</div>
+                                ) : null}
                             </div>
                             <div>
                                 <label
@@ -31,20 +84,38 @@ const Login = () => {
                                     Password
                                 </label>
                                 <input
+                                    id="password"
                                     name="password"
-                                    className="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring"
+                                    type="password"
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    value={formik.values.password}
+                                    className={`w-full rounded border ${
+                                        formik.touched.password && formik.errors.password 
+                                            ? 'border-red-500' 
+                                            : 'border-gray-300'
+                                    } bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring`}
                                 />
+                                {formik.touched.password && formik.errors.password ? (
+                                    <div className="mt-1 text-sm text-red-500">{formik.errors.password}</div>
+                                ) : null}
                             </div>
-                            <button className="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-gray-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base">
-                                Log in
+                            <button 
+                                type="submit"
+                                className="block rounded-lg bg-gray-800 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-gray-300 transition duration-100 hover:bg-gray-700 focus-visible:ring active:bg-gray-600 md:text-base"
+                                disabled={formik.isSubmitting}
+                            >
+                                {formik.isSubmitting ? 'Logging in...' : 'Log in'}
                             </button>
+                            
                             <div className="relative flex items-center justify-center">
                                 <span className="absolute inset-x-0 h-px bg-gray-300" />
                                 <span className="relative bg-white px-4 text-sm text-gray-400">
                                     Log in with social
                                 </span>
                             </div>
-                            <button className="flex items-center justify-center gap-2 rounded-lg bg-blue-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-blue-300 transition duration-100 hover:bg-blue-600 focus-visible:ring active:bg-blue-700 md:text-base">
+                            
+                            <button type="button" className="flex items-center justify-center gap-2 rounded-lg bg-blue-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-blue-300 transition duration-100 hover:bg-blue-600 focus-visible:ring active:bg-blue-700 md:text-base">
                                 <svg
                                     className="h-5 w-5 shrink-0"
                                     width={24}
@@ -60,7 +131,7 @@ const Login = () => {
                                 </svg>
                                 Continue with Facebook
                             </button>
-                            <button className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-8 py-3 text-center text-sm font-semibold text-gray-800 outline-none ring-gray-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:text-base">
+                            <button type="button" className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-8 py-3 text-center text-sm font-semibold text-gray-800 outline-none ring-gray-300 transition duration-100 hover:bg-gray-100 focus-visible:ring active:bg-gray-200 md:text-base">
                                 <svg
                                     className="h-5 w-5 shrink-0"
                                     width={24}
@@ -103,9 +174,8 @@ const Login = () => {
                     </form>
                 </div>
             </div>
-
         </div>
-    )
-}
+    );
+};
 
 export default Login;
